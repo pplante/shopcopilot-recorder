@@ -1,0 +1,25 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@": [
+        "."
+      ],
+      "@/*": [
+        "./*"
+      ]
+    },
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/web-ext-types/index.d.ts",
+      "types"
+    ]
+  },
+  "exclude": [
+    ".output",
+  ],
+  "types": [
+    "chrome"
+  ]
+}

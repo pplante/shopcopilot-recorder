@@ -1,0 +1,10 @@
+/*noinspection CssInvalidAtRule*/
+@unocss all;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+}

@@ -1,0 +1,15 @@
+.scr-action-hide {
+  --scr-action-color: gray;
+}
+
+.scr-action-enable {
+  --scr-action-color: green;
+}
+
+.scr-action-disable {
+  --scr-action-color: purple;
+}
+
+.scr-action-remove {
+  --scr-action-color: red;
+}
