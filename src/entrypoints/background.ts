@@ -1,10 +1,8 @@
-import type { TabRecording } from '@/lib/resourceRecord'
 import { backgroundMessenger } from '@/lib/backgroundMessenger'
-import { browser, WebRequest } from 'wxt/browser'
+import { browser } from 'wxt/browser'
 /* eslint-disable no-console */
 import { WEB_REQUEST_URL_FILTER } from '@/lib/constants'
 import { extensionStorage } from '@/lib/extStorage'
-import OnHeadersReceivedDetailsType = WebRequest.OnHeadersReceivedDetailsType
 
 async function getCurrentTab() {
   const [tab] = await browser.tabs.query({
@@ -41,7 +39,7 @@ export default defineBackground(() => {
     }).catch(console.error)
   })
 
-  browser.webRequest.onHeadersReceived.addListener((details: OnHeadersReceivedDetailsType) => {
+  browser.webRequest.onHeadersReceived.addListener((details) => {
     // console.log('onHeadersReceived', details)
 
     extensionStorage.getItem('activeRecording').then((activeRecording) => {
@@ -119,7 +117,7 @@ export default defineBackground(() => {
       return
     }
 
-    const activeRecording: TabRecording = {
+    const activeRecording = {
       id: crypto.randomUUID(),
       tabId,
       startUrl,
@@ -127,11 +125,36 @@ export default defineBackground(() => {
       elements: [],
       resources: [],
     }
-    console.log('new session', activeRecording)
 
     await extensionStorage.setItem('activeRecording', activeRecording).catch(console.error)
-
     await browser.tabs.reload(tabId)
+  })
+  backgroundMessenger.onMessage('resumeRecording', async ({ data }) => {
+    const { tabId, startUrl } = await getCurrentTab()
+
+    if (tabId === undefined || startUrl === undefined) {
+      console.error('sender tab id or url is undefined')
+      return false
+    }
+
+    let allRecordings = await extensionStorage.getItem('tabRecordings')
+    if (allRecordings !== null) {
+      const activeRecording = allRecordings.find(recording => recording.id === data)
+
+      if (activeRecording) {
+        allRecordings = allRecordings.filter((recording) => {
+          return recording.id !== data
+        })
+
+        await extensionStorage.setItem('tabRecordings', allRecordings).catch(console.error)
+        await extensionStorage.setItem('activeRecording', activeRecording).catch(console.error)
+        await browser.tabs.reload(tabId)
+
+        return true
+      }
+    }
+
+    return false
   })
 
   backgroundMessenger.onMessage('stopRecording', async () => {

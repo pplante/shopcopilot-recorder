@@ -1,4 +1,3 @@
-import { resolve } from 'node:path'
 import antfu from '@antfu/eslint-config'
 
 export default await antfu({
@@ -16,9 +15,9 @@ export default await antfu({
     'types',
   ],
   stylistic: { maxLineLength: 100 },
-  typescript: {
-    tsconfigPath: resolve(process.cwd(), 'tsconfig.json'),
-  },
+  // typescript: {
+  //   tsconfigPath: resolve(process.cwd(), '.wxt/tsconfig.json'),
+  // },
 }, {
   files: ['**/*.ts'],
   rules: {

@@ -47,6 +47,8 @@ onMounted(async () => {
 
     <RuleBuilder v-if="activeRecording" :allow-removal="false" :recording="activeRecording" title="Active Recording" />
 
-    <RecordingList :recordings="recordings" />
+    <template v-for="recording in recordings" :key="recording.tabId">
+      <RuleBuilder :recording="recording" />
+    </template>
   </div>
 </template>

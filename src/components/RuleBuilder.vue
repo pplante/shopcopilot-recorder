@@ -74,6 +74,10 @@ watch([selectedResources, selectedUrls], () => {
 
   newRuleText.value = JSON.stringify(newRule.value, null, 2)
 })
+
+async function resumeRecording() {
+  await backgroundMessenger.sendMessage('resumeRecording', props.recording.id)
+}
 </script>
 
 <template>
@@ -86,6 +90,7 @@ watch([selectedResources, selectedUrls], () => {
     <template v-if="allowRemoval" #icons>
       <ConfirmPopup />
       <Button icon="pi pi-times" rounded severity="danger" size="small" text @click="confirmRemoval($event)" />
+      <Button icon="pi pi-camera" rounded size="small" text @click="resumeRecording" />
     </template>
     <div>
       <Divider align="center">

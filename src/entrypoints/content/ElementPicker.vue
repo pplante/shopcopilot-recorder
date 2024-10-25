@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { TabRecording } from '@/lib/resourceRecord'
+import type { Ref } from 'vue'
 import ElementOverlay from '@/entrypoints/content/ElementOverlay.vue'
 import { backgroundMessenger } from '@/lib/backgroundMessenger'
 import { extensionStorage } from '@/lib/extStorage'

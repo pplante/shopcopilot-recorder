@@ -3,6 +3,7 @@ import { defineExtensionMessaging } from '@webext-core/messaging'
 
 interface ProtocolMap {
   startRecording: () => void
+  resumeRecording: (recordingId: string) => boolean
   stopRecording: () => void
   removeRecording: (recordingId: string) => void
   activeRecordingChanged: (recording: TabRecording | null) => void

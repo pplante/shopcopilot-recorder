@@ -14,6 +14,7 @@ config()
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
+  srcDir: 'src',
   imports: {
     addons: {
       vueTemplate: true,
@@ -24,24 +25,6 @@ export default defineConfig({
   },
   extensionApi: 'chrome',
   // modules: ['@wxt-dev/module-vue'],
-  runner: {
-    openConsole: true,
-    openDevtools: true,
-    startUrls: [
-      // 'https://shop-test-bed.fly.dev/signin',
-      'http://notetsy.internal:4321/your/shops/me/dashboard',
-      // 'https://shop-test-bed.fly.dev/your/shops/me/dashboard',
-      // 'https://www.etsy.com',
-    ],
-    binaries: {
-      // chrome: '/Applications/Chromium.app/Contents/MacOS/Chromium',
-    },
-    chromiumArgs: [
-      '--auto-open-devtools-for-tabs',
-      '--hide-crash-restore-bubble',
-      '--user-data-dir=.chrome-profile',
-    ],
-  },
   manifest: {
     key: process.env.VITE_CRX_PUBLIC_KEY,
     name: 'Shop Copilot Recorder',
@@ -55,18 +38,10 @@ export default defineConfig({
     ],
     action: {},
     permissions: [
-      'system.display',
-
-      'browsingData',
-      'identity',
       'storage',
-      'cookies',
-      'contentSettings',
       'tabs',
-      'proxy',
       'sidePanel',
       'webRequest',
-      'webRequestAuthProvider',
       'webNavigation',
       'declarativeNetRequest',
     ],
@@ -89,13 +64,13 @@ export default defineConfig({
         imports: [
           'vue',
         ],
-        dts: resolve('types/auto-imports.d.ts'),
+        dts: resolve('src/types/auto-imports.d.ts'),
       }),
 
       // https://github.com/antfu/unplugin-vue-components
       Components({
-        dirs: [resolve('components/')],
-        dts: resolve('types/components.d.ts'),
+        dirs: [resolve('src/components/')],
+        dts: resolve('src/types/components.d.ts'),
         resolvers: [
           PrimeVueResolver(),
           // auto import icons
