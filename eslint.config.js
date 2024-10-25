@@ -15,9 +15,6 @@ export default await antfu({
     'types',
   ],
   stylistic: { maxLineLength: 100 },
-  // typescript: {
-  //   tsconfigPath: resolve(process.cwd(), '.wxt/tsconfig.json'),
-  // },
 }, {
   files: ['**/*.ts'],
   rules: {

@@ -1,8 +1,8 @@
 import { backgroundMessenger } from '@/lib/backgroundMessenger'
-import { browser } from 'wxt/browser'
-/* eslint-disable no-console */
 import { WEB_REQUEST_URL_FILTER } from '@/lib/constants'
+
 import { extensionStorage } from '@/lib/extStorage'
+import { browser } from 'wxt/browser'
 
 async function getCurrentTab() {
   const [tab] = await browser.tabs.query({
@@ -16,12 +16,9 @@ async function getCurrentTab() {
 }
 
 export default defineBackground(() => {
-  console.log('Hello background!', { id: browser.runtime.id })
-
   browser.webNavigation.onBeforeNavigate.addListener((details) => {
-    // console.log('onBeforeNavigate', details)
     extensionStorage.getItem('activeRecording').then((activeRecording) => {
-      if (activeRecording === null || activeRecording.tabId !== details.tabId) {
+      if (activeRecording?.tabId !== details.tabId) {
         return
       }
 
@@ -40,10 +37,8 @@ export default defineBackground(() => {
   })
 
   browser.webRequest.onHeadersReceived.addListener((details) => {
-    // console.log('onHeadersReceived', details)
-
     extensionStorage.getItem('activeRecording').then((activeRecording) => {
-      if (activeRecording === null || activeRecording.tabId !== details.tabId) {
+      if (activeRecording?.tabId !== details.tabId) {
         return
       }
 
@@ -186,12 +181,8 @@ export default defineBackground(() => {
     if (allRecordings === null) {
       return
     }
-    console.log('allRecordings pre', data, allRecordings)
-    allRecordings = allRecordings.filter((recording) => {
-      return recording.id !== data
-    })
+    allRecordings = allRecordings.filter(recording => recording.id !== data)
 
-    console.log('allRecordings', data, allRecordings)
     await extensionStorage.setItem('tabRecordings', allRecordings).catch(console.error)
   })
 })

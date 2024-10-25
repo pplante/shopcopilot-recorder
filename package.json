@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "NODE_NO_WARNINGS=1 wxt --mv3",
-    "dev:firefox": "wxt -b firefox",
+    "dev:firefox": "NODE_NO_WARNINGS=1 wxt -b firefox",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",

@@ -1,4 +1,4 @@
-// postcss.config.mjs
+// postcss.config.js
 import UnoCSS from '@unocss/postcss'
 
 export default {
