@@ -14,22 +14,32 @@ async function getCurrentTab() {
 
   return { tabId, startUrl }
 }
+function removeProtocolAndHost(url: string) {
+  const parsedUrl = new URL(url)
+  return parsedUrl.pathname + parsedUrl.search + parsedUrl.hash
+}
 
 export default defineBackground(() => {
+  chrome.sidePanel.setPanelBehavior({
+    openPanelOnActionClick: true,
+  })
+
   browser.webNavigation.onBeforeNavigate.addListener((details) => {
     extensionStorage.getItem('activeRecording').then((activeRecording) => {
       if (activeRecording?.tabId !== details.tabId) {
         return
       }
 
+      const url = removeProtocolAndHost(details.url)
+
       const existing = activeRecording.urls.find((record) => {
-        return record.url === details.url
+        return record.url === url
       })
       if (existing) {
         existing.timesSeen++
       }
       else {
-        activeRecording.urls.push({ url: details.url, timesSeen: 1 })
+        activeRecording.urls.push({ url, timesSeen: 1 })
       }
 
       extensionStorage.setItem('activeRecording', activeRecording).catch(console.error)
@@ -42,8 +52,10 @@ export default defineBackground(() => {
         return
       }
 
+      const url = removeProtocolAndHost(details.url)
+
       const existing = activeRecording.resources.find((record) => {
-        return record.method === details.method && record.url === details.url
+        return record.method === details.method && record.url === url
       })
       if (existing) {
         existing.timesSeen++
@@ -51,7 +63,7 @@ export default defineBackground(() => {
       else {
         activeRecording.resources.push({
           id: details.requestId,
-          url: details.url,
+          url,
           type: details.type,
           method: details.method,
           originUrl: details.documentUrl ?? details.originUrl ?? details.initiator,

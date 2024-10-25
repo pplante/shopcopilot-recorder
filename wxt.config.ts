@@ -36,7 +36,6 @@ export default defineConfig({
         ],
       },
     ],
-    action: {},
     permissions: [
       'storage',
       'tabs',
