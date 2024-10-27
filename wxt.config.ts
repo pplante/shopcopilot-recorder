@@ -57,7 +57,7 @@ export default defineConfig({
     plugins: [
       vue(),
       TurboConsole({
-        specifiedEditor: 'webstorm',
+        disableLaunchEditor: true,
       }),
       AutoImport({
         imports: [
