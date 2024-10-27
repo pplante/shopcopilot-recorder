@@ -5,14 +5,10 @@ import { backgroundMessenger } from '@/lib/backgroundMessenger'
 import { useConfirm } from 'primevue/useconfirm'
 import { ref } from 'vue'
 
-const props = defineProps({
+defineProps({
   allowRemoval: {
     type: Boolean,
     default: true,
-  },
-  recording: {
-    type: Object as PropType<TabRecording>,
-    required: true,
   },
   title: {
     type: String,
@@ -20,7 +16,33 @@ const props = defineProps({
   },
 })
 
+const model = defineModel<TabRecording>({ required: true })
+
+const advancedMode = ref(false)
+
 const confirm = useConfirm()
+
+const menu = ref(null)
+
+const items = ref([
+  {
+    label: 'Advanced Mode',
+    icon: 'pi pi-sliders-h',
+    command: () => (advancedMode.value = !advancedMode.value),
+  },
+  {
+    label: 'Resume Recording',
+    icon: 'pi pi-camera',
+    command: resumeRecording,
+  },
+  {
+    separator: true,
+  },
+])
+
+function toggleMenu(event: Event) {
+  menu.value?.toggle(event)
+}
 
 function confirmRemoval(event: Event) {
   confirm.require({
@@ -37,7 +59,7 @@ function confirmRemoval(event: Event) {
       severity: 'danger',
     },
     accept: async () => {
-      await backgroundMessenger.sendMessage('removeRecording', props.recording.id)
+      await backgroundMessenger.sendMessage('removeRecording', model.value.id)
     },
   })
 }
@@ -46,8 +68,10 @@ const selectedUrls: Ref<UrlRecord[]> = ref([])
 const selectedResources: Ref<ResourceRecord[]> = ref([])
 const newRule: Ref<IScopeFilter | null> = ref(null)
 const newRuleText = ref('')
+const elementActions = reactive(model.value?.elements)
+watch([selectedResources, selectedUrls, elementActions], updateRuleText)
 
-watch([selectedResources, selectedUrls], () => {
+function updateRuleText() {
   const applyTo = selectedUrls.value.map(rec => rec.url)
   const resources = { allow: selectedResources.value.map(resource => resource.url) }
   const rule: IScopeFilter = {
@@ -58,13 +82,10 @@ watch([selectedResources, selectedUrls], () => {
     rule.resources = resources
   }
 
-  const elementActions: IElementFilter = {
-    enable: [],
-    disable: [],
-    hide: [],
-    remove: [],
-  }
-  props.recording?.elements.forEach((v) => {
+  const elementActions: IElementFilter = {}
+  model.value?.elements.forEach((v) => {
+    elementActions[v.action] ||= []
+    console.log(elementActions, v.action, elementActions[v.action])
     elementActions[v.action]?.push(v.selector)
   })
 
@@ -73,24 +94,38 @@ watch([selectedResources, selectedUrls], () => {
   newRule.value = rule
 
   newRuleText.value = JSON.stringify(newRule.value, null, 2)
-})
+}
 
 async function resumeRecording() {
-  await backgroundMessenger.sendMessage('resumeRecording', props.recording.id)
+  await backgroundMessenger.sendMessage('resumeRecording', model.value.id)
 }
+
+onMounted(() => {
+  updateRuleText()
+})
 </script>
 
 <template>
-  <Panel :toggleable="allowRemoval">
+  <Panel :collapsed="allowRemoval" :toggleable="allowRemoval">
     <template #header>
-      <h2 sc-font="bold" sc-text="lg">
+      <h2 sc-font="bold">
         {{ title }}
       </h2>
     </template>
     <template v-if="allowRemoval" #icons>
       <ConfirmPopup />
-      <Button icon="pi pi-times" rounded severity="danger" size="small" text @click="confirmRemoval($event)" />
-      <Button icon="pi pi-camera" rounded size="small" text @click="resumeRecording" />
+      <Button
+        aria-controls="overlay_menu" aria-haspopup="true" icon="pi pi-cog" rounded severity="secondary" text
+        @click="toggleMenu"
+      />
+      <Menu id="config_menu" ref="menu" :model="items" popup>
+        <template #end>
+          <Button
+            class="sc-w-full !sc-justify-start" icon="pi pi-times" label="Delete" severity="danger" size="small"
+            text @click="confirmRemoval($event)"
+          />
+        </template>
+      </Menu>
     </template>
     <div>
       <Divider align="center">
@@ -100,15 +135,15 @@ async function resumeRecording() {
       </Divider>
       <DataTable
         v-model:selection="selectedUrls"
-        :value="props.recording?.urls"
+        :value="model?.urls"
         scroll-height="450px"
         scrollable
         size="small"
       >
-        <Column header-style="width: 3rem" selection-mode="multiple" />
+        <Column selection-mode="multiple" />
 
         <Column field="url" header="URL" />
-        <Column field="timesSeen" header="# Seen" />
+        <Column v-if="advancedMode" field="timesSeen" header="# Seen" />
       </DataTable>
     </div>
 
@@ -118,8 +153,8 @@ async function resumeRecording() {
           Element Actions
         </p>
       </Divider>
-      <ElementActionEditor v-for="sa in props.recording?.elements" :key="sa.id" :model-value="sa" />
-      <p v-if="props.recording?.elements.length === 0">
+      <ElementActionEditor v-for="sa in model?.elements" :key="sa.id" :model-value="sa" />
+      <p v-if="model?.elements.length === 0">
         Use the "Pick Element" button in the page viewport to select elements.
       </p>
     </div>
@@ -133,17 +168,17 @@ async function resumeRecording() {
 
       <DataTable
         v-model:selection="selectedResources"
-        :value="props.recording?.resources"
+        :value="model?.resources"
         scroll-height="450px"
         scrollable
         size="small"
       >
-        <Column header-style="width: 3rem" selection-mode="multiple" />
+        <Column selection-mode="multiple" />
 
         <Column field="url" header="URL" />
-        <Column field="type" header="Type" />
-        <Column field="statusCode" header="Status Code" />
-        <Column field="timesSeen" header="# Seen" />
+        <Column v-if="advancedMode" field="type" header="Type" />
+        <Column v-if="advancedMode" field="statusCode" header="Status Code" />
+        <Column v-if="advancedMode" field="timesSeen" header="# Seen" />
       </DataTable>
     </div>
 
