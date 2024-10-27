@@ -1,7 +1,7 @@
 import type { ElementAction, TabRecording } from '@/lib/resourceRecord'
 import ElementPicker from '@/entrypoints/content/ElementPicker.vue'
 import { backgroundMessenger } from '@/lib/backgroundMessenger'
-/* eslint-disable no-console */
+
 import { URL_FILTER_MATCHERS } from '@/lib/constants'
 import { extensionStorage } from '@/lib/extStorage'
 import Aura from '@primevue/themes/aura'
@@ -37,10 +37,7 @@ function applyElementHighlights(actions: ElementAction[]) {
 export default defineContentScript({
   matches: URL_FILTER_MATCHERS,
   runAt: 'document_end',
-  cssInjectionMode: 'manifest',
   async main(ctx) {
-    console.log('Hello content.', ctx)
-
     extensionStorage.onChange('activeRecording', (val: TabRecording | null) => {
       // clean up any existing selections, including removing outlines
       destroyElementHighlights()

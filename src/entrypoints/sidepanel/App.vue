@@ -32,23 +32,18 @@ onMounted(async () => {
 <template>
   <div sc-flex="~ col" sc-gap="4">
     <Button
-      v-if="!activeRecording"
+      :label="activeRecording ? 'Stop Recording' : 'Start Recording'"
+      :severity="activeRecording ? 'danger' : 'primary'"
       icon="pi pi-camera"
-      label="Start Recording"
-      @click="startNewRecording"
-    />
-    <Button
-      v-else
-      icon="pi pi-camera"
-      label="Stop Recording"
-      severity="danger"
-      @click="stopRecording"
+      @click="activeRecording ? stopRecording() : startNewRecording()"
     />
 
-    <RuleBuilder v-if="activeRecording" :allow-removal="false" :recording="activeRecording" title="Active Recording" />
+    <RuleBuilder v-if="activeRecording" v-model="activeRecording" :allow-removal="false" title="Active Recording" />
 
-    <template v-for="recording in recordings" :key="recording.tabId">
-      <RuleBuilder :recording="recording" />
-    </template>
+    <RuleBuilder
+      v-for="(recording, index) in recordings"
+      :key="recording.tabId"
+      v-model="recordings[index]"
+    />
   </div>
 </template>
