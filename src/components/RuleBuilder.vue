@@ -68,8 +68,7 @@ const selectedUrls: Ref<UrlRecord[]> = ref([])
 const selectedResources: Ref<ResourceRecord[]> = ref([])
 const newRule: Ref<IScopeFilter | null> = ref(null)
 const newRuleText = ref('')
-const elementActions = reactive(model.value?.elements)
-watch([selectedResources, selectedUrls, elementActions], updateRuleText)
+watch([selectedResources, selectedUrls, model], updateRuleText)
 
 function updateRuleText() {
   const applyTo = selectedUrls.value.map(rec => rec.url)
