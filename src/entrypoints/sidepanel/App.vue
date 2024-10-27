@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-/* eslint-disable no-console */
 import type { TabRecording } from '@/lib/resourceRecord'
 import { backgroundMessenger } from '@/lib/backgroundMessenger'
 import { extensionStorage } from '@/lib/extStorage'
@@ -20,11 +19,7 @@ onMounted(async () => {
   activeRecording.value = await extensionStorage.getItem('activeRecording')
   recordings.value = await extensionStorage.getItem('tabRecordings') ?? []
 
-  extensionStorage.onChange('activeRecording', (val: TabRecording | null) => {
-    console.log('activeRecording', val)
-    activeRecording.value = val
-  })
-
+  extensionStorage.onChange('activeRecording', (val: TabRecording | null) => activeRecording.value = val)
   extensionStorage.onChange('tabRecordings', (val: TabRecording[]) => recordings.value = val)
 })
 </script>
