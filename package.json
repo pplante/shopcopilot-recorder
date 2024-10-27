@@ -48,6 +48,7 @@
     "vue": "^3.5.12"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.279",
     "@types/cookie": "^0.6.0",
     "@types/debug": "^4.1.12",
     "@types/tough-cookie": "^4.0.5",
