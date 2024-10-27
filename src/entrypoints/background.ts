@@ -149,6 +149,7 @@ export default defineBackground(() => {
       const activeRecording = allRecordings.find(recording => recording.id === data)
 
       if (activeRecording) {
+        activeRecording.tabId = tabId
         allRecordings = allRecordings.filter((recording) => {
           return recording.id !== data
         })
